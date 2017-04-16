@@ -28,7 +28,7 @@ def webhook():
     return r
 
 def makeWebhookResult(req):
-    if req.get("result").get("action") != "class.assignment":
+    if req.get("result").get("action") != "class-assignment":
         return {}
     result = req.get("result")
     parameters = result.get("parameters")
