@@ -21,11 +21,14 @@ def webhook():
 
     res = makeWebhookResult(req)
 
+    res = makeWebhookResultTime(req)
+
     res = json.dumps(res, indent=4)
     print(res)
     r = make_response(res)
     r.headers['Content-Type'] = 'application/json'
     return r
+
 
 def makeWebhookResult(req):
     if req.get("result").get("action") != "class-assignment":
@@ -52,6 +55,38 @@ def makeWebhookResult(req):
         "source": "apiai-onlinestore-shipping"
     }
 
+def makeWebhookResultTime(req):
+    if req.get("result").get("action") != "class.timings":
+        return {}
+    result = req.get("result")
+    parameters = result.get("parameters")
+    zone = parameters.get("timings-relative")
+
+	calendarfortoday = {"algorithms" : "10 AM" , "COA" : "11 AM", "Software" : "9 AM"}
+
+	calendarfortomorrow = {"algorithms" : "9 AM" , "COA" : "10 AM", "Software" : "11 AM"}
+
+    cost = {'today': 1 , 'tomorrow': 2}
+    
+    if cost[zone] == 1:
+        speech = "The timetable for " + zone + " is " + str(calendarfortoday["Software"]) + "\n" + 
+        												str(calendarfortoday["algorithms"]) + "\n" +
+        												str(calendarfortoday["COA"]) + " . "
+    if cost[zone] != 1:
+         speech = "The timetable for " + zone + " is " + str(calendarfortomorrow["algorithms"]) + "\n" + 
+        												str(calendarfortomorrow["COA"]) + "\n" +
+        												str(calendarfortomorrow["Software"]) + " . "
+    print("Response:")
+    print(speech)
+
+    return {
+        "speech": speech,
+        "displayText": speech,
+        #"data": {},
+        # "contextOut": [],
+        "source": "apiai-onlinestore-shipping"
+    }
+
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
@@ -59,3 +94,4 @@ if __name__ == '__main__':
     print "Starting app on port %d" % port
 
     app.run(debug=True, port=port, host='0.0.0.0')
+
